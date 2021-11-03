@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>718</width>
-    <height>579</height>
+    <height>600</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -44,9 +44,15 @@
        </item>
        <item>
         <widget class="QWidget" name="mainChannel" native="true">
-         <property name="maximumSize">
+         <property name="minimumSize">
           <size>
            <width>0</width>
+           <height>300</height>
+          </size>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>16777215</width>
            <height>16777215</height>
           </size>
          </property>
@@ -119,6 +125,12 @@
            <horstretch>0</horstretch>
            <verstretch>0</verstretch>
           </sizepolicy>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>16777215</width>
+           <height>200</height>
+          </size>
          </property>
         </widget>
        </item>
@@ -343,6 +355,7 @@
     <addaction name="actionRe_construction"/>
     <addaction name="actionShow_on_secondary_channel"/>
     <addaction name="actionHide_secondary_channel"/>
+    <addaction name="actionShow_reconstructed_on_main_channel"/>
    </widget>
    <widget class="QMenu" name="menuComposer">
     <property name="title">
@@ -407,6 +420,11 @@
   <action name="actionSave_composed_as">
    <property name="text">
     <string>Save composed as</string>
+   </property>
+  </action>
+  <action name="actionShow_reconstructed_on_main_channel">
+   <property name="text">
+    <string>Show reconstructed on main channel</string>
    </property>
   </action>
  </widget>
