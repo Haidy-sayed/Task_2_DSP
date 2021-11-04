@@ -231,7 +231,9 @@ class Ui_MainWindow(object):
         self.secindaryChannel.setMaximumHeight(0)
 
     def showSecondChannel(self):
-        self.secindaryChannel.setMinimumHeight(230)
+        self.secindaryChannel.setMinimumHeight(0)
+        self.secindaryChannel.setMaximumHeight(200)
+
 
     def exitApp(self):
         sys.exit()
