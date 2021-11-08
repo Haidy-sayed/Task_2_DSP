@@ -304,7 +304,7 @@ class Ui_Form(object):
         
     def gen_csv(self):
         df = pd.DataFrame({"time" :self.t, "amplitude" :self.sum_amp})
-        df.to_csv("trial.csv", index=False)
+        df.to_csv("sinusoidal.csv", index=False)
 
     
     
