@@ -19,6 +19,8 @@ from pyqtgraph import *
 import pyqtgraph as pg
 from pyqtgraph import PlotWidget, PlotItem
 #from matplotlib.pyplot import draw
+import matplotlib.pyplot as plt
+from scipy.fftpack import fft, ifft
 import pandas as pd
 import matplotlib.pyplot as plt
 from PyQt5.QtWidgets import QApplication, QColorDialog, QFileDialog, QFrame, QWidget, QInputDialog, QLineEdit,QComboBox
@@ -40,17 +42,10 @@ from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.figure import Figure
 import cv2
 import io
-from numpy.fft import fft, ifft
+from numpy.fft import fft, fftfreq, ifft
+from scipy.fftpack import fft, ifft
 from scipy import signal
-
-class SpecCanvas(FigureCanvas):
-
-     def __init__(self, parent=None, width=5, height=4, dpi=100):
-         fig = Figure(figsize = (width , height) , dpi=dpi)
-         self.axes = fig.add_subplot(111)
-         super(SpecCanvas, self).__init__(fig)        
-         fig.tight_layout()
-
+import cmath
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
@@ -153,17 +148,23 @@ class Ui_MainWindow(object):
         self.actionOpen_composer.triggered.connect(lambda:self.openSecond())
 
         self.timer1 = QtCore.QTimer()
-
-        self.color = "#ffaa00" 
-        self.timerInterval1 = 400
+        self.time1=0
         self.amp1=0
-        self.mainChannel.setXRange(0, 20, padding=0)     
+        self.ampArray=0
+        self.timeSample=0
+        self.timeBeign=0
+        self.timeEnd=0
+        self.Fsample=0
+        self.color = "#ffaa00" 
+        self.timerInterval = 1
+        self.coeffSample=0
+        self.mainChannel.setXRange(0, 2, padding=0)     
         self.mainChannel.setLimits(xMin=0)
-        self.mainChannel.setLimits(xMax=62)
+        self.mainChannel.setLimits(xMax=20)
         self.mainChannel.setLimits(yMin=-1)
         self.mainChannel.setLimits(yMax=1)
         
-        self.secindaryChannel.setXRange(0, 20, padding=0)     
+        self.secindaryChannel.setXRange(0, 2, padding=0)     
         self.secindaryChannel.setLimits(xMin=0)
         self.secindaryChannel.setLimits(xMax=62)
         self.secindaryChannel.setLimits(yMin=-1)
@@ -183,7 +184,9 @@ class Ui_MainWindow(object):
         self.menuSignal_processes.setTitle(_translate("MainWindow", "Signal processes"))
         self.actionOpen_file.setText(_translate("MainWindow", "Open file"))
         self.actionSave_as.setText(_translate("MainWindow", "Save as "))
+        self.actionSave_as.setShortcut(_translate("MainWindow", "Ctrl+S"))
         self.actionExit.setText(_translate("MainWindow", "Exit"))
+        self.actionExit.setShortcut(_translate("MainWindow", "esc"))
         self.actionOpen_composer.setText(_translate("MainWindow", "Open composer"))
         self.actionSample.setText(_translate("MainWindow", "Sample"))
         self.actionReconstruct.setText(_translate("MainWindow", "Reconstruct"))
@@ -192,12 +195,11 @@ class Ui_MainWindow(object):
         self.actionShow_reconstructed_on_main.setText(_translate("MainWindow", "Show reconstructed on main"))
         self.actionExit.triggered.connect(lambda: self.exitApp())
         self.actionOpen_file.triggered.connect(lambda: self.openFile())
-        self.actionSample.triggered.connect(lambda: self.signalSample())
-        self.freqSlider.valueChanged.connect(lambda: self.signalSample(self.freqSlider.value))
+        self.actionSample.triggered.connect(lambda: self.signalSample(self.time1,self.amp1,self.coeffSample))
+        self.freqSlider.valueChanged.connect(lambda: self.signalSample(self.time1,self.amp1,self.freqSlider.value()))
         self.actionHide_2nd_Ch.triggered.connect(lambda: self.hideSecondChannel())
         self.actionShow_2nd_Ch.triggered.connect(lambda: self.showSecondChannel())
-
-
+        self.actionReconstruct.triggered.connect(lambda: self.reconstruct())
 
     def openFile(self):
       """opens a file from the brower """
@@ -207,26 +209,60 @@ class Ui_MainWindow(object):
 
     def read_data(self,file_name):
         """loads the data from chosen file"""
-        df1=pd.read_csv(file_name)
+        global dataFile
+        dataFile=pd.read_csv(file_name)
         self.label1=file_name
-        time1=list(pd.to_numeric(df1['time'],downcast="float"))
-        amp1=list(pd.to_numeric(df1['amplitude'],downcast="float"))
-        Fmax=fft(df1)
-        self.draw(time1,amp1,self.color)
+        self.time1=list(pd.to_numeric(dataFile['time'],downcast="float"))
+        self.amp1=list(pd.to_numeric(dataFile['amplitude'],downcast="float"))
+        self.draw(self.time1,self.amp1,self.color)
+        self.signalSample(self.time1, self.amp1,0)
 
     def draw(self,time,amp,color):
         """sets up our canvas to plot"""
-        self.time = time
-        self.amp=amp
+        self.time1 = time
+        self.amp1=amp
         self.index=0  
         pen = pyqtgraph.mkPen(color) #signal color
-        self.mainChannel.plot(self.time[0:self.index+1000], self.amp[0:self.index+1000], pen=pen)
+        self.mainChannel.plot(self.time1[0:self.index+1000], self.amp1[0:self.index+1000], pen=pen)
         self.timer1.setInterval(100)
         self.timer1.start()
 
-    def signalSample(self,Fsample):
-        pass
+    def signalSample(self,time, amp,sliderValue):
+        self.coeffSample=sliderValue
+        Fmax = max(fft(amp)).real
+        self.Fsample = self.coeffSample * Fmax
+        samplingInterval =(self.Fsample)
+        self.timeEnd=time[999]
+        self.timeBeign=0
+        self.timeSample = np.arange(self.timeBeign,(self.timeEnd),(self.timeEnd/len(time)))
+        ampArray =[None]*len(self.timeSample)
+        self.numSamples=1/self.Fsample
+        self.samplingStep= int(len(ampArray)//samplingInterval)
+        counter=0
+        sampleCounter=0
 
+        while (sampleCounter <len(ampArray)):
+            ampArray[sampleCounter]=amp[sampleCounter]
+            print(ampArray[sampleCounter])
+            sampleCounter = sampleCounter+self.samplingStep
+            
+       # self.updatePlot(sliderValue,timeSample,ampArray)
+        self.mainChannel.plot(self.timeSample[0:len(self.timeSample)],ampArray[0:len(self.timeSample)], symbol = '+')
+
+    def reconstruct(self):
+        timeReconstrct=self.timeSample
+        ampReconstruct=self.ampArray
+        FReConstSample= self.Fsample
+        
+
+        for n in timeReconstrct:
+            ampReconstruct[n]=(2*numpy.pi*(n/FReConstSample) )* numpy.sinc((n-((ampReconstruct[n])/FReConstSample))/FReConstSample)
+            print(ampReconstruct[n])
+        
+     
+        
+
+    
     def hideSecondChannel(self):
         self.secindaryChannel.setMaximumHeight(0)
 
