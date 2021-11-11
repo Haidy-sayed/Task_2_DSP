@@ -7,9 +7,9 @@
 # WARNING! All changes made in this file will be lost!
 
 from pyqtgraph import PlotWidget
-from Task2GUI_composer import Ui_Form
+from Task2GUI_composerFinal import Ui_Form
 from PyQt5 import QtCore, QtGui, QtWidgets
-from Task2GUI_composer import Ui_Form
+from Task2GUI_composerFinal import Ui_Form
 import pyqtgraph.exporters
 from fpdf import FPDF
 import statistics
@@ -40,7 +40,6 @@ from pyqtgraph.graphicsItems.ScatterPlotItem import Symbols
 from pyqtgraph.graphicsItems.ImageItem import ImageItem
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.figure import Figure
-import cv2
 import io
 from numpy.fft import fft, fftfreq, ifft
 from scipy.fftpack import fft, ifft
@@ -161,14 +160,14 @@ class Ui_MainWindow(object):
         self.mainChannel.setXRange(0, 2, padding=0)     
         self.mainChannel.setLimits(xMin=0)
         self.mainChannel.setLimits(xMax=20)
-        self.mainChannel.setLimits(yMin=-1)
-        self.mainChannel.setLimits(yMax=1)
+        self.mainChannel.setLimits(yMin=-20)
+        self.mainChannel.setLimits(yMax=20)
         
         self.secindaryChannel.setXRange(0, 2, padding=0)     
         self.secindaryChannel.setLimits(xMin=0)
         self.secindaryChannel.setLimits(xMax=62)
-        self.secindaryChannel.setLimits(yMin=-1)
-        self.secindaryChannel.setLimits(yMax=1)
+        self.secindaryChannel.setLimits(yMin=-20)
+        self.secindaryChannel.setLimits(yMax=20)
 
 
         self.retranslateUi(MainWindow)
@@ -229,7 +228,7 @@ class Ui_MainWindow(object):
 
     def signalSample(self,time, amp,sliderValue):
         self.coeffSample=sliderValue
-        Fmax = max(fft(amp)).real
+        Fmax = max(ifft(fft(time))).real
         self.Fsample = self.coeffSample * Fmax
         samplingInterval =(self.Fsample)
         self.timeEnd=time[999]
@@ -240,10 +239,14 @@ class Ui_MainWindow(object):
         self.samplingStep= int(len(ampArray)//samplingInterval)
         counter=0
         sampleCounter=0
+        print(Fmax)
+        print(len(self.timeSample))
+        print(samplingInterval)
+        print(self.numSamples)
+        
 
         while (sampleCounter <len(ampArray)):
             ampArray[sampleCounter]=amp[sampleCounter]
-            print(ampArray[sampleCounter])
             sampleCounter = sampleCounter+self.samplingStep
             
        # self.updatePlot(sliderValue,timeSample,ampArray)
