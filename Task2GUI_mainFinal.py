@@ -156,6 +156,10 @@ class Ui_MainWindow(object):
         self.mainChannel.setLimits(xMax=20)
         self.mainChannel.setLimits(yMin=-20)
         self.mainChannel.setLimits(yMax=20)
+        self.array1=0
+        self.array2=0
+        self.array3=0
+        
         
         self.secindaryChannel.setXRange(0, 2, padding=0)     
         self.secindaryChannel.setLimits(xMin=0)
@@ -219,6 +223,8 @@ class Ui_MainWindow(object):
 
     def signalSample(self,time, amp,sliderValue):
         self.coeffSample=sliderValue
+    
+            
         Fmax = max(ifft(fft(amp))).real
         self.Fsample = self.coeffSample * Fmax
         self.samplingInterval =(self.Fsample)
@@ -240,7 +246,8 @@ class Ui_MainWindow(object):
         while (sampleCounter <len(self.ampArray)):
             self.ampArray[sampleCounter]=amp[sampleCounter]
             sampleCounter = sampleCounter+self.samplingStep
-            
+
+ 
        # self.updatePlot(sliderValue,timeSample,ampArray)
         self.mainChannel.plot(self.timeSample[0:len(self.timeSample)],self.ampArray[0:len(self.timeSample)], symbol = '+')
 
@@ -270,10 +277,42 @@ class Ui_MainWindow(object):
             j+=1
         #print(sumSignalReconstruct)
         #print(ampReconstruct)
-            
+           
         self.secindaryChannel.plot(timeReconstrct[0:len(timeReconstrct)],sumSignalReconstruct[0:len(timeReconstrct)])
-    
-    
+        self.updateReconstruct(timeReconstrct,sumSignalReconstruct,self.freqSlider.value()) 
+
+    def updateReconstruct(self,time,sum,val):
+        
+        if val==0:
+            
+            self.secindaryChannel.plot(time[0:len(time)],self.array1[0:len(time)],pen = pyqtgraph.mkPen("#000000"))
+            self.secindaryChannel.plot(time[0:len(time)],self.array2[0:len(time)],pen = pyqtgraph.mkPen("#000000"))
+            self.secindaryChannel.plot(time[0:len(time)],self.array3[0:len(time)],pen = pyqtgraph.mkPen("#000000"))
+
+        elif val==1:
+            self.array1=sum
+            self.secindaryChannel.plot(time[0:len(time)],self.array1[0:len(time)],pen = pyqtgraph.mkPen("#ffaa00"))
+            self.secindaryChannel.plot(time[0:len(time)],self.array2[0:len(time)],pen = pyqtgraph.mkPen("#000000"))
+            self.secindaryChannel.plot(time[0:len(time)],self.array3[0:len(time)],pen = pyqtgraph.mkPen("#000000"))
+
+        elif val==2:
+           
+            self.array2=sum
+            self.secindaryChannel.plot(time[0:len(time)],self.array1[0:len(time)],pen = pyqtgraph.mkPen("#000000"))
+            self.secindaryChannel.plot(time[0:len(time)],self.array2[0:len(time)],pen = pyqtgraph.mkPen("#ffaa00"))
+            self.secindaryChannel.plot(time[0:len(time)],self.array3[0:len(time)],pen = pyqtgraph.mkPen("#000000"))
+        elif val==3:
+      
+            self.array3=sum
+            self.secindaryChannel.plot(time[0:len(time)],self.array1[0:len(time)],pen = pyqtgraph.mkPen("#000000"))
+            self.secindaryChannel.plot(time[0:len(time)],self.array2[0:len(time)],pen = pyqtgraph.mkPen("#000000"))
+            self.secindaryChannel.plot(time[0:len(time)],self.array3[0:len(time)],pen = pyqtgraph.mkPen("#ffaa00"))
+        
+
+
+
+
+
     def hideSecondChannel(self):
         self.secindaryChannel.setMaximumHeight(0)
 
