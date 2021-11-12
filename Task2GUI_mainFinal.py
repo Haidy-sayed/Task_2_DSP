@@ -40,10 +40,12 @@ from pyqtgraph.graphicsItems.ScatterPlotItem import Symbols
 from pyqtgraph.graphicsItems.ImageItem import ImageItem
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.figure import Figure
+from scipy.interpolate import interp1d
 import io
 from numpy.fft import fft, fftfreq, ifft
 from scipy.fftpack import fft, ifft
 from scipy import signal
+import scipy 
 import cmath
 
 class Ui_MainWindow(object):
@@ -228,7 +230,7 @@ class Ui_MainWindow(object):
 
     def signalSample(self,time, amp,sliderValue):
         self.coeffSample=sliderValue
-        Fmax = max(ifft(fft(amp))).real
+        Fmax = max(ifft(fft(time))).real
         self.Fsample = self.coeffSample * Fmax
         self.samplingInterval =(self.Fsample)
         self.timeEnd=time[999]
@@ -239,10 +241,10 @@ class Ui_MainWindow(object):
         self.samplingStep= int(len(self.ampArray)//self.samplingInterval)
         counter=0
         sampleCounter=0
-        print(Fmax)
-        print(len(self.timeSample))
-        print(self.samplingInterval)
-        print(self.numSamples)
+        #print(Fmax)
+        #print(len(self.timeSample))
+        #print(self.samplingInterval)
+        #print(self.numSamples)
         
 
         while (sampleCounter <len(self.ampArray)):
@@ -268,18 +270,19 @@ class Ui_MainWindow(object):
         j=0        
         print("===============================================================================================")
 
-        while j < len(timeReconstrct):
+        while j <len(timeReconstrct):
             #print(j)
             #print(ampReconstruct[j])
             #print( ampReconstruct[j])
             #print(numpy.sinc(j))
-            for k in np.arange(0,(1/numSample),1):
+            #print(self.samplingStep)
+            for k in np.arange(-2*numpy.pi*len(timeReconstrct),2*numpy.pi*len(timeReconstrct)):
                 sumSignalReconstruct[j] += (numpy.sinc((timeReconstrct[j]-(k*(1/FReConstSample)))/(1/FReConstSample)))
+                #sumSignalReconstruct = interp1d(ampReconstruct)
             j+=1
-        print(sumSignalReconstruct)
         #print(ampReconstruct)
             
-        self.secindaryChannel.plot(timeReconstrct[0:len(timeReconstrct)],sumSignalReconstruct[0:len(timeReconstrct)])
+        self.secindaryChannel.plot(timeReconstrct[0:len(self.timeSample)],sumSignalReconstruct[0:len(self.timeSample)], symbol = '+')
     
     
     def hideSecondChannel(self):
