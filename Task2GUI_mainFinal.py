@@ -235,15 +235,15 @@ class Ui_MainWindow(object):
         self.timeBeign=0
         self.timeSample = np.arange(self.timeBeign,(self.timeEnd),(self.timeEnd/len(time)))
         self.ampArray =[None]*len(self.timeSample)
-        self.numSamples=1/self.Fsample
-        self.samplingStep= int(len(self.ampArray)*self.samplingInterval)
+        self.numSamples=max(self.timeSample)*(self.Fsample)
+        self.samplingStep= int(len(self.ampArray)/self.numSamples)
         counter=0
         sampleCounter=0
-        print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
-        print(Fmax)
-        print(len(self.timeSample))
-        print(self.samplingInterval)
-        print(self.samplingStep)
+        #print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
+        #print(Fmax)
+        #print(len(self.timeSample))
+        #print(self.samplingInterval)
+        #print(self.numSamples)
         
 
         while (sampleCounter <len(self.ampArray)):
@@ -256,7 +256,7 @@ class Ui_MainWindow(object):
     def reConstruct(self, numSample, tVal, ampArr, tSample):
         timeReconstrct=tSample
         ampReconstruct=ampArr
-        print(len(ampReconstruct))
+        #print(len(ampReconstruct))
         #removing the none
         i=0
         while i < len(ampReconstruct):
@@ -267,7 +267,7 @@ class Ui_MainWindow(object):
 
         FReConstSample= self.Fsample
         j=0        
-        print("===============================================================================================")
+        #print("===============================================================================================")
         maxAmp= max(self.ampArray)
         while j < len(timeReconstrct):
             #print(j)
@@ -277,7 +277,7 @@ class Ui_MainWindow(object):
             for k in np.arange(-len(timeReconstrct), len(timeReconstrct),1):
                 sumSignalReconstruct[j] += maxAmp*((numpy.sinc((timeReconstrct[j]-(k*(1/FReConstSample)))/(1/FReConstSample))))
             j+=1
-        print(sumSignalReconstruct)
+        #print(sumSignalReconstruct)
         #print(ampReconstruct)
             
         self.secindaryChannel.plot(timeReconstrct[0:len(timeReconstrct)],sumSignalReconstruct[0:len(timeReconstrct)])
