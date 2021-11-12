@@ -228,7 +228,7 @@ class Ui_MainWindow(object):
 
     def signalSample(self,time, amp,sliderValue):
         self.coeffSample=sliderValue
-        Fmax = max(ifft(fft(time))).real
+        Fmax = max(ifft(fft(amp))).real
         self.Fsample = self.coeffSample * Fmax
         self.samplingInterval =(self.Fsample)
         self.timeEnd=time[999]
@@ -239,10 +239,10 @@ class Ui_MainWindow(object):
         self.samplingStep= int(len(self.ampArray)//self.samplingInterval)
         counter=0
         sampleCounter=0
-        #print(Fmax)
-        #print(len(self.timeSample))
-        #print(self.samplingInterval)
-        #print(self.numSamples)
+        print(Fmax)
+        print(len(self.timeSample))
+        print(self.samplingInterval)
+        print(self.numSamples)
         
 
         while (sampleCounter <len(self.ampArray)):
@@ -279,7 +279,7 @@ class Ui_MainWindow(object):
         print(sumSignalReconstruct)
         #print(ampReconstruct)
             
-        self.secindaryChannel.plot(timeReconstrct[0:len(self.timeSample)],sumSignalReconstruct[0:len(self.timeSample)], symbol = '+')
+        self.secindaryChannel.plot(timeReconstrct[0:len(timeReconstrct)],sumSignalReconstruct[0:len(timeReconstrct)])
     
     
     def hideSecondChannel(self):
