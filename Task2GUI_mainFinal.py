@@ -151,13 +151,12 @@ class Ui_MainWindow(object):
         self.amp1=0
         self.ampArray=0
         self.timeSample=0
-        self.timeBeign=0
-        self.timeEnd=0
+        self.numSamples=0
         self.samplingInterval=0
         self.Fsample=0
         self.color = "#ffaa00" 
         self.timerInterval = 1
-        self.coeffSample=1
+        self.coeffSample=0
         self.mainChannel.setXRange(0, 2, padding=0)     
         self.mainChannel.setLimits(xMin=0)
         self.mainChannel.setLimits(xMax=20)
@@ -199,7 +198,7 @@ class Ui_MainWindow(object):
         self.freqSlider.valueChanged.connect(lambda: self.signalSample(self.time1,self.amp1,self.freqSlider.value()))
         self.actionHide_2nd_Ch.triggered.connect(lambda: self.hideSecondChannel())
         self.actionShow_2nd_Ch.triggered.connect(lambda: self.showSecondChannel())
-        self.actionReconstruct.triggered.connect(lambda: self.reConstruct(self.timeBeign, self.timeEnd, self.samplingInterval, self.ampArray, self.timeSample))
+        self.actionReconstruct.triggered.connect(lambda: self.reConstruct(self.numSamples, self.samplingInterval, self.ampArray, self.timeSample))
 
     def openFile(self):
       """opens a file from the brower """
@@ -240,10 +239,10 @@ class Ui_MainWindow(object):
         self.samplingStep= int(len(self.ampArray)//self.samplingInterval)
         counter=0
         sampleCounter=0
-        print(Fmax)
-        print(len(self.timeSample))
-        print(self.samplingInterval)
-        print(self.numSamples)
+        #print(Fmax)
+        #print(len(self.timeSample))
+        #print(self.samplingInterval)
+        #print(self.numSamples)
         
 
         while (sampleCounter <len(self.ampArray)):
@@ -253,7 +252,7 @@ class Ui_MainWindow(object):
        # self.updatePlot(sliderValue,timeSample,ampArray)
         self.mainChannel.plot(self.timeSample[0:len(self.timeSample)],self.ampArray[0:len(self.timeSample)], symbol = '+')
 
-    def reConstruct(self, tBeign, tEnd, tVal, ampArr, tSample):
+    def reConstruct(self, numSample, tVal, ampArr, tSample):
         timeReconstrct=tSample
         ampReconstruct=ampArr
         print(len(ampReconstruct))
@@ -263,18 +262,24 @@ class Ui_MainWindow(object):
             if ampReconstruct[i] == None:
                 ampReconstruct[i]=0
             i=i+1
-        print("===============================================================================================")
-        print(ampReconstruct[999])
-        sumSignalReconstruct=0
+        sumSignalReconstruct=[0]*len(self.timeSample)
 
         FReConstSample= self.Fsample
-        j=0
+        j=0        
+        print("===============================================================================================")
+
         while j < len(timeReconstrct):
-            print(ampReconstruct[j])
-            sumSignalReconstruct += ampReconstruct[j/FReConstSample]* numpy.sinc(j-(FReConstSample*timeReconstrct[j]))
-            
-        #self.mainChannel.plot(self.timeSample[0:len(self.timeSample)],sumSignalReconstruct[0:len(self.timeSample)], symbol = '+')
+            #print(j)
+            #print(ampReconstruct[j])
+            #print( ampReconstruct[j])
+            #print(numpy.sinc(j))
+            for k in np.arange(0,(1/numSample),1):
+                sumSignalReconstruct[j] += (numpy.sinc((timeReconstrct[j]-(k*(1/FReConstSample)))/(1/FReConstSample)))
+            j+=1
         print(sumSignalReconstruct)
+        #print(ampReconstruct)
+            
+        self.secindaryChannel.plot(timeReconstrct[0:len(self.timeSample)],sumSignalReconstruct[0:len(self.timeSample)], symbol = '+')
     
     
     def hideSecondChannel(self):
