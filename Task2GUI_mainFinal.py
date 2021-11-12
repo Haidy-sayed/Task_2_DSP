@@ -268,10 +268,10 @@ class Ui_MainWindow(object):
         sumSignalReconstruct=0
 
         FReConstSample= self.Fsample
-        
-        for n in timeReconstrct:
-            print(ampReconstruct[n])
-            sumSignalReconstruct += ampReconstruct[n/FReConstSample]* numpy.sinc(n-(FReConstSample*timeReconstrct[n]))
+        j=0
+        while j < len(timeReconstrct):
+            print(ampReconstruct[j])
+            sumSignalReconstruct += ampReconstruct[j/FReConstSample]* numpy.sinc(j-(FReConstSample*timeReconstrct[j]))
             
         #self.mainChannel.plot(self.timeSample[0:len(self.timeSample)],sumSignalReconstruct[0:len(self.timeSample)], symbol = '+')
         print(sumSignalReconstruct)
@@ -306,4 +306,3 @@ if __name__ == "__main__":
     ui.setupUi(MainWindow)
     MainWindow.show()
     sys.exit(app.exec_())
-
