@@ -40,12 +40,10 @@ from pyqtgraph.graphicsItems.ScatterPlotItem import Symbols
 from pyqtgraph.graphicsItems.ImageItem import ImageItem
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.figure import Figure
-from scipy.interpolate import interp1d
 import io
 from numpy.fft import fft, fftfreq, ifft
 from scipy.fftpack import fft, ifft
 from scipy import signal
-import scipy 
 import cmath
 
 class Ui_MainWindow(object):
@@ -230,7 +228,7 @@ class Ui_MainWindow(object):
 
     def signalSample(self,time, amp,sliderValue):
         self.coeffSample=sliderValue
-        Fmax = max(ifft(fft(time))).real
+        Fmax = max(ifft(fft(amp))).real
         self.Fsample = self.coeffSample * Fmax
         self.samplingInterval =(self.Fsample)
         self.timeEnd=time[999]
@@ -238,13 +236,14 @@ class Ui_MainWindow(object):
         self.timeSample = np.arange(self.timeBeign,(self.timeEnd),(self.timeEnd/len(time)))
         self.ampArray =[None]*len(self.timeSample)
         self.numSamples=1/self.Fsample
-        self.samplingStep= int(len(self.ampArray)//self.samplingInterval)
+        self.samplingStep= int(len(self.ampArray)*self.samplingInterval)
         counter=0
         sampleCounter=0
-        #print(Fmax)
-        #print(len(self.timeSample))
-        #print(self.samplingInterval)
-        #print(self.numSamples)
+        print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
+        print(Fmax)
+        print(len(self.timeSample))
+        print(self.samplingInterval)
+        print(self.samplingStep)
         
 
         while (sampleCounter <len(self.ampArray)):
@@ -269,20 +268,19 @@ class Ui_MainWindow(object):
         FReConstSample= self.Fsample
         j=0        
         print("===============================================================================================")
-
-        while j <len(timeReconstrct):
+        maxAmp= max(self.ampArray)
+        while j < len(timeReconstrct):
             #print(j)
             #print(ampReconstruct[j])
             #print( ampReconstruct[j])
             #print(numpy.sinc(j))
-            #print(self.samplingStep)
-            for k in np.arange(-2*numpy.pi*len(timeReconstrct),2*numpy.pi*len(timeReconstrct)):
-                sumSignalReconstruct[j] += (numpy.sinc((timeReconstrct[j]-(k*(1/FReConstSample)))/(1/FReConstSample)))
-                #sumSignalReconstruct = interp1d(ampReconstruct)
+            for k in np.arange(-len(timeReconstrct), len(timeReconstrct),1):
+                sumSignalReconstruct[j] += maxAmp*((numpy.sinc((timeReconstrct[j]-(k*(1/FReConstSample)))/(1/FReConstSample))))
             j+=1
+        print(sumSignalReconstruct)
         #print(ampReconstruct)
             
-        self.secindaryChannel.plot(timeReconstrct[0:len(self.timeSample)],sumSignalReconstruct[0:len(self.timeSample)], symbol = '+')
+        self.secindaryChannel.plot(timeReconstrct[0:len(timeReconstrct)],sumSignalReconstruct[0:len(timeReconstrct)])
     
     
     def hideSecondChannel(self):
