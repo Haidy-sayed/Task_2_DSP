@@ -195,6 +195,8 @@ class Ui_MainWindow(object):
         self.actionShow_2nd_Ch.triggered.connect(lambda: self.showSecondChannel())
         self.actionReconstruct.triggered.connect(lambda: self.reConstruct(self.numSamples, self.samplingInterval, self.ampArray, self.timeSample))
         
+        
+
     def openFile(self):
       """opens a file from the brower """
       file_path=QFileDialog.getOpenFileName()
@@ -222,7 +224,9 @@ class Ui_MainWindow(object):
         self.timer1.start()
 
     def signalSample(self,time, amp,sliderValue):
-        self.coeffSample=sliderValue            
+        self.coeffSample=sliderValue
+    
+            
         Fmax = max(ifft(fft(amp))).real
         self.Fsample = self.coeffSample * Fmax
         self.samplingInterval =(self.Fsample)
@@ -232,16 +236,19 @@ class Ui_MainWindow(object):
         self.ampArray =[None]*len(self.timeSample)
         self.numSamples=max(self.timeSample)*(self.Fsample)
         self.samplingStep= int(len(self.ampArray)/self.numSamples)
+        counter=0
         sampleCounter=0
         #print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
         #print(Fmax)
         #print(len(self.timeSample))
         #print(self.samplingInterval)
         #print(self.numSamples)
+        
 
         while (sampleCounter <len(self.ampArray)):
             self.ampArray[sampleCounter]=amp[sampleCounter]
             sampleCounter = sampleCounter+self.samplingStep
+
  
        # self.updatePlot(sliderValue,timeSample,ampArray)
         self.mainChannel.plot(self.timeSample[0:len(self.timeSample)],self.ampArray[0:len(self.timeSample)], symbol = '+')
@@ -304,6 +311,10 @@ class Ui_MainWindow(object):
             self.secindaryChannel.plot(time[0:len(time)],self.array3[0:len(time)],pen = pyqtgraph.mkPen("#ffaa00"))
         
 
+
+
+
+
     def hideSecondChannel(self):
         self.secindaryChannel.setMaximumHeight(0)
 
@@ -315,14 +326,23 @@ class Ui_MainWindow(object):
     def exitApp(self):
         sys.exit()
 
-    
+    def move_to_main(self):
+        """moves composed signal to main graph"""
+        self.move_t=self.ui.t
+      #  print(self.ui.sum_amp)
+        self.move_amp=self.ui.sum_amp
+        self.mainChannel.plot(self.move_t,self.move_amp)
 
 
     def openSecond(self):
+        """opens the composer gui"""
+
         self.Form = QtWidgets.QMainWindow()
         self.ui = Ui_Form()
         self.ui.setupUi(self.Form)
         self.Form.show()
+        self.ui.pushButton_2.clicked.connect( lambda : self.move_to_main())
+
 
 
 if __name__ == "__main__":
@@ -331,5 +351,6 @@ if __name__ == "__main__":
     MainWindow = QtWidgets.QMainWindow()
     ui = Ui_MainWindow()
     ui.setupUi(MainWindow)
+
     MainWindow.show()
     sys.exit(app.exec_())
