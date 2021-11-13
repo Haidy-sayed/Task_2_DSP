@@ -222,9 +222,7 @@ class Ui_MainWindow(object):
         self.timer1.start()
 
     def signalSample(self,time, amp,sliderValue):
-        self.coeffSample=sliderValue
-    
-            
+        self.coeffSample=sliderValue            
         Fmax = max(ifft(fft(amp))).real
         self.Fsample = self.coeffSample * Fmax
         self.samplingInterval =(self.Fsample)
@@ -234,19 +232,16 @@ class Ui_MainWindow(object):
         self.ampArray =[None]*len(self.timeSample)
         self.numSamples=max(self.timeSample)*(self.Fsample)
         self.samplingStep= int(len(self.ampArray)/self.numSamples)
-        counter=0
         sampleCounter=0
         #print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
         #print(Fmax)
         #print(len(self.timeSample))
         #print(self.samplingInterval)
         #print(self.numSamples)
-        
 
         while (sampleCounter <len(self.ampArray)):
             self.ampArray[sampleCounter]=amp[sampleCounter]
             sampleCounter = sampleCounter+self.samplingStep
-
  
        # self.updatePlot(sliderValue,timeSample,ampArray)
         self.mainChannel.plot(self.timeSample[0:len(self.timeSample)],self.ampArray[0:len(self.timeSample)], symbol = '+')
@@ -308,10 +303,6 @@ class Ui_MainWindow(object):
             self.secindaryChannel.plot(time[0:len(time)],self.array2[0:len(time)],pen = pyqtgraph.mkPen("#000000"))
             self.secindaryChannel.plot(time[0:len(time)],self.array3[0:len(time)],pen = pyqtgraph.mkPen("#ffaa00"))
         
-
-
-
-
 
     def hideSecondChannel(self):
         self.secindaryChannel.setMaximumHeight(0)
