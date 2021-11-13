@@ -224,7 +224,7 @@ class Ui_Form(object):
         
         self.actionSave_composed_signal.triggered.connect(lambda: self.gen_csv())
        
-        self.pushButton_4.clicked.connect( lambda : self.move_to_main())
+   #     self.pushButton_2.clicked.connect( lambda : self.move_to_main())
 
 
         self.freq = 1
@@ -232,6 +232,7 @@ class Ui_Form(object):
         self.ph = 0
         self.summation=[]
         self.summation_dict={}
+        self.sum_amp=[]
         self.t=np.linspace(0, 5, 1000)
 
         
@@ -308,20 +309,6 @@ class Ui_Form(object):
         df.to_csv("sinusoidal.csv", index=False)
 
     
-    #your_method
-# =============================================================================
-#     def move_to_main(self):
-#         self.gen_csv()
-#         Ui_MainWindow.read_data()
-# =============================================================================
-    
-  
-    
-  #old_method
-# =============================================================================
-#     def move_to_main2(self):
-#         .mainChannel.plot(self.t,self.sum_amp)
-# =============================================================================
         
         
 if __name__ == "__main__":
