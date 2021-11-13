@@ -5,6 +5,8 @@
 # Created by: PyQt5 UI code generator 5.9.2
 #
 # WARNING! All changes made in this file will be lost!
+
+#from Task2GUI_composerFinal import Ui_MainWindow
 import numpy as np
 import pandas as pd
 from PyQt5 import QtCore, QtGui, QtWidgets
@@ -221,7 +223,8 @@ class Ui_Form(object):
         self.pushButton_5.clicked.connect(lambda: self.addSinCombo())
         
         self.actionSave_composed_signal.triggered.connect(lambda: self.gen_csv())
-
+       
+        self.pushButton_4.clicked.connect( lambda : self.move_to_main())
 
 
         self.freq = 1
@@ -297,8 +300,6 @@ class Ui_Form(object):
         
         self.plot_summation()
     #    self.curve2.clear()
-
-        
         pass
        
         
@@ -307,8 +308,22 @@ class Ui_Form(object):
         df.to_csv("sinusoidal.csv", index=False)
 
     
+    #your_method
+# =============================================================================
+#     def move_to_main(self):
+#         self.gen_csv()
+#         Ui_MainWindow.read_data()
+# =============================================================================
     
+  
     
+  #old_method
+# =============================================================================
+#     def move_to_main2(self):
+#         .mainChannel.plot(self.t,self.sum_amp)
+# =============================================================================
+        
+        
 if __name__ == "__main__":
     import sys
     app = QtWidgets.QApplication(sys.argv)
